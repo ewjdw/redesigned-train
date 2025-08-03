@@ -3,4 +3,8 @@ workload = "rtrainapp"
 environment = "#{environment}#"
 subscription_id = "#{subscriptionId}#"
 acr_sku = "Basic"
-database_sku_name  = "Basic" 
+
+sql_config = {
+  database_sku_name  = "Basic"
+  storage_account_type = "Local"
+}

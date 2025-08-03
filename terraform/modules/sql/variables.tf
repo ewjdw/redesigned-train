@@ -53,3 +53,9 @@ variable "database_sku_name" {
   type        = string
   
 }
+
+variable "storage_account_type" {
+  description = "The storage account type for the SQL database backup"
+  type        = string
+  
+}

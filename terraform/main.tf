@@ -34,6 +34,7 @@ module "sql" {
   sql_server_name = "sql${var.workload}${var.environment}"
   administrator_login = var.sql_admin_login
   administrator_password = var.sql_admin_password
-  database_sku_name = var.database_sku_name
+  database_sku_name = var.sql_config.database_sku_name
+  storage_account_type = var.sql_config.storage_account_type
   tags = local.tags
 }

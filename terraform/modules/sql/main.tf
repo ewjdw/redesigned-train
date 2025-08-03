@@ -21,6 +21,7 @@ resource "azurerm_mssql_database" "rtrain_sql_database" {
   server_id = azurerm_mssql_server.rtrain_sql_server.id
   sku_name           = var.database_sku_name
   collation          = "SQL_Latin1_General_CP1_CI_AS"
+  storage_account_type = var.storage_account_type
 
   tags = local.tags
 

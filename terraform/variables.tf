@@ -41,8 +41,11 @@ variable "sql_admin_login" {
   
 }
 
-variable "database_sku_name" {
-  description = "The SKU name for the SQL database"
-  type        = string
+variable "sql_config" {
+  description = "Configuration for SQL resources including database SKU and storage account type"
+  type        = object({
+    database_sku_name    = string
+    storage_account_type = string
+  })
   
 }
