@@ -20,6 +20,8 @@ resource "azurerm_linux_web_app" "rtrain_app_service" {
   }
 
   site_config {
+    container_registry_use_managed_identity = true
+    
     application_stack {
       docker_image_name   = "${var.acr_login_server}/${var.workload}-${var.environment}:latest"
       docker_registry_url = "https://${var.acr_login_server}"
