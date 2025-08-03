@@ -28,7 +28,6 @@ resource "azurerm_linux_web_app" "rtrain_app_service" {
 
   app_settings = {
     "ConnectionStrings__DefaultConnection" = "Server=tcp:${var.sql_server_fqdn},1433;Initial Catalog=${var.sql_database_name};Authentication=Active Directory Managed Identity;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-    DOCKER_REGISTRY_SERVER_URL = "https://${var.acr_login_server}"
   }
 
   tags = var.tags
