@@ -134,8 +134,16 @@ jobs:
 
       - name: Get Terraform output
         id: tf_output
-        run: bash ../scripts/query_tf_outputs.sh
+        run: |
+          terraform output -json
+          bash ../scripts/query_tf_outputs.sh
       
+      - name: Debug TF outputs
+        run: |
+          echo "SQL FQDN: ${{ steps.tf_output.outputs.sql_fqdn }}"
+          echo "SQL DB: ${{ steps.tf_output.outputs.sql_db }}"
+          echo "App Principal ID: ${{ steps.tf_output.outputs.app_principal_id }}"
+
   setup-database:
     name: "Setup Database User - ${{ inputs.environment }}"
     runs-on: windows-latest
@@ -156,11 +164,17 @@ jobs:
         with:
           creds: ${{ secrets.azure_credentials }}
 
+      - name: Debug job outputs
+        run: |
+          Write-Host "SQL FQDN: ${{ needs.terraform-apply.outputs.sql_fqdn }}"
+          Write-Host "SQL DB: ${{ needs.terraform-apply.outputs.sql_db }}"
+          Write-Host "App Principal ID: ${{ needs.terraform-apply.outputs.app_principal_id }}"
+          
       - name: Get terraform outputs
         env:
           SQL_ADMIN_LOGIN: ${{ inputs.sql_admin_login }}
           SQL_ADMIN_PASSWORD: ${{ secrets.sql_admin_password }}
-          SQL_FQDN: ${{ needs.terraform-apply.outputs.SQL_FQDN }}
+          SQL_FQDN: ${{ needs.terraform-apply.outputs.sql_fqdn }}
           SQL_DB: ${{ needs.terraform-apply.outputs.sql_db }}
           APP_PRINCIPAL_ID: ${{ needs.terraform-apply.outputs.app_principal_id }}
         run: powershell -File ./scripts/create_or_update_db_user.ps1
