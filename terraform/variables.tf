@@ -21,3 +21,9 @@ variable "workload" {
   type        = string
   
 }
+
+variable "acr_sku" {
+  description = "The SKU for the Azure Container Registry"
+  type        = string
+  
+}
