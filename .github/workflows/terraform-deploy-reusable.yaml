@@ -67,6 +67,7 @@ jobs:
           backendStorageAccount: ${{ vars.BACKEND_STORAGE_ACCOUNT }}
           environment: ${{ inputs.environment }}
           subscriptionId: ${{ vars.SUBSCRIPTION_ID }}
+          azureTenantId: ${{ vars.AZURE_TENANT_ID }}
 
       - name: Initialize Terraform
         run: terraform init

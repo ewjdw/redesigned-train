@@ -16,6 +16,12 @@ variable "subscription_id" {
   
 }
 
+variable "azure_tenant_id" {
+  description = "The Azure tenant ID for the deployment"
+  type        = string
+  
+}
+
 variable "workload" {
   description = "The workload type for the deployment (e.g., app)"
   type        = string
@@ -47,5 +53,11 @@ variable "sql_config" {
     database_sku_name    = string
     storage_account_type = string
   })
+  
+}
+
+variable "app_service_plan_sku_name" {
+  description = "The SKU name for the App Service Plan"
+  type        = string
   
 }

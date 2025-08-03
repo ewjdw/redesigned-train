@@ -10,8 +10,8 @@ output "database_name" {
   
 }
 
-output "sql_server_id" {
+output "sql_server_name" {
   description = "The ID of the SQL server"
-  value       = azurerm_mssql_server.rtrain_sql_server.id
+  value       = azurerm_mssql_server.rtrain_sql_server.name
   
 }
