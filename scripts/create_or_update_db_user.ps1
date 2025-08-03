@@ -10,6 +10,10 @@ az login --service-principal `
 
 az account set --subscription $env:AZURE_SUBSCRIPTION_ID
 
+write-host "fqdn: $($env:SQL_FQDN)"
+write-host "db: $($env:SQL_DB)"
+write-host "app principal id: $($env:APP_PRINCIPAL_ID)"
+
 $sqlCommand = @"
 DROP USER IF EXISTS [$($env:APP_PRINCIPAL_ID)];
 CREATE USER [$($env:APP_PRINCIPAL_ID)] FROM EXTERNAL PROVIDER;
