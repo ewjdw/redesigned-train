@@ -140,7 +140,7 @@ jobs:
           )
           
           for var_name in "${!tf_vars[@]}"; do
-            tf_output="{tf_vars[$var_name]}"
+            tf_output="${tf_vars[$var_name]}"
             var_value=$(jq -r .${tf_output}.value terraform_output.json)
             echo "$var_name=$var_value" >> $GITHUB_ENV
           done
