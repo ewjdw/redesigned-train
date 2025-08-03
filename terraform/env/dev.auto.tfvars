@@ -1,5 +1,5 @@
 location = "polandcentral"
-workload = "app"
+workload = "rtrainapp"
 environment = "#{environment}#"
 subscription_id = "#{subscriptionId}#"
 acr_sku = "Basic"
