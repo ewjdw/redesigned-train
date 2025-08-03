@@ -10,7 +10,7 @@ ALTER ROLE db_datareader ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 "@
 
-  sqlcmd --authentication-method ActiveDirectoryServicePrincipal `
+  sqlcmd --authentication-method="ActiveDirectoryServicePrincipal" `
     -S $env:SQL_FQDN `
     -d $env:SQL_DB `
     -U $env:AZURE_CLIENT_ID `
