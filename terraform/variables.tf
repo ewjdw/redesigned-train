@@ -28,12 +28,21 @@ variable "acr_sku" {
   
 }
 
-variable "sql_config" {
-  description = "Configuration for the SQL server and database"
-  type = object({
-    sql_admin_login    = string
-    sql_admin_password = string
-    database_sku_name  = string
-  })
+variable "sql_admin_password" {
+  description = "The administrator password for the SQL server"
+  type        = string
+  sensitive   = true
+  
+}
+
+variable "sql_admin_login" {
+  description = "The administrator login for the SQL server"
+  type        = string
+  
+}
+
+variable "database_sku_name" {
+  description = "The SKU name for the SQL database"
+  type        = string
   
 }

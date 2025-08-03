@@ -14,7 +14,9 @@ jobs:
     uses: ./.github/workflows/terraform-deploy-reusable.yaml
     with:
       environment: dev
+      sql_admin_login: ${{ vars.SQL_ADMIN_DEV }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
       azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+      sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD_DEV }}

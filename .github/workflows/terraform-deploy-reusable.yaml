@@ -7,6 +7,10 @@ on:
         description: "The environment to deploy to (e.g., dev, prod)"
         required: true
         type: string
+      sql_admin_login:
+        description: "SQL Admin Login for the database"
+        required: true
+        type: string
     secrets:
       azure_credentials:
         description: "Azure Credentials for authentication"
@@ -16,6 +20,9 @@ on:
         required: true
       azure_client_id:
         description: "Azure Client ID for authentication"
+        required: true
+      sql_admin_password:
+        description: "SQL Admin Password for the database"
         required: true
 
 jobs:
@@ -31,8 +38,8 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
       ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-      SQL_ADMIN_LOGIN: ${{ vars.SQL_ADMIN_LOGIN }}
-      SQL_ADMIN_PASSWORD: ${{ vars.SQL_ADMIN_PASSWORD }}
+      TF_VAR_sql_admin_login: ${{ inputs.sql_admin_login }}
+      TF_VAR_sql_admin_password: ${{ secrets.sql_admin_password }}
 
     steps:
       - name: Checkout code
@@ -60,8 +67,6 @@ jobs:
           backendStorageAccount: ${{ vars.BACKEND_STORAGE_ACCOUNT }}
           environment: ${{ inputs.environment }}
           subscriptionId: ${{ vars.SUBSCRIPTION_ID }}
-          sqlAdminLogin: ${{ vars.SQL_ADMIN_LOGIN }}
-          sqlAdminPassword: ${{ vars.SQL_ADMIN_PASSWORD }}
 
       - name: Initialize Terraform
         run: terraform init
@@ -91,8 +96,8 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
       ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-      SQL_ADMIN_LOGIN: ${{ vars.SQL_ADMIN_LOGIN }}
-      SQL_ADMIN_PASSWORD: ${{ vars.SQL_ADMIN_PASSWORD }}
+      TF_VAR_sql_admin_login: ${{ inputs.sql_admin_login }}
+      TF_VAR_sql_admin_password: ${{ secrets.sql_admin_password }}
 
     steps:
       - name: Checkout code
