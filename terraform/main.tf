@@ -55,7 +55,6 @@ module "appservice" {
 resource "azurerm_role_assignment" "appservice_acr_pull" {
   scope                = azurerm_container_registry.rtrain_acr.id
   role_definition_name = "AcrPull"
-  principal_id         = module.appservice.appservice_principal_id
+  principal_id         = module.appservice.app_service_principal_id
   
 }
-
