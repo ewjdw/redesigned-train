@@ -134,7 +134,7 @@ jobs:
 
       - name: Get Terraform output
         id: tf_output
-        run: bash ../scripts/get_terraform_output.sh
+        run: bash ../scripts/query_tf_outputs.sh
       
   setup-database:
     name: "Setup Database User - ${{ inputs.environment }}"
