@@ -1,0 +1,75 @@
+name: "Terraform Deploy Reusable Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The environment to deploy to (e.g., dev, prod)"
+        required: true
+        type: string
+    secrets:
+      azure_credentials:
+        description: "Azure Credentials for authentication"
+        required: true
+      azure_client_secret:
+        description: "Azure Client Secret for authentication"
+        required: true
+      azure_client_id:
+        description: "Azure Client ID for authentication"
+        required: true
+
+jobs:
+  terraform-plan:
+    name: "Terraform Plan to ${{ inputs.environment }}"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: terraform
+    env:
+      ARM_CLIENT_ID: ${{ secrets.azure_client_id }}
+      ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Azure with Service Principal
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.azure_credentials }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.7.0"
+
+      - name: Copy environment tfvars
+        run: |
+          cp env/${{ inputs.environment }}.auto.tfvars ./
+
+      - name: Replace tokens
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["terraform/backend.tf", "terraform/${{ inputs.environment }}.auto.tfvars"]'
+        env:
+          backendStorageAccount: ${{ vars.BACKEND_STORAGE_ACCOUNT }}
+          environment: ${{ inputs.environment }}
+          subscriptionId: ${{ vars.SUBSCRIPTION_ID }}
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Validate Terraform configuration
+        run: terraform validate
+
+      - name: Plan Terraform deployment
+        run: terraform plan -out=tf-plan-${{ inputs.environment }}.tfplan
+
+      - name: Upload Terraform plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tf-plan-${{ inputs.environment }}.tfplan
+          path: terraform/tf-plan-${{ inputs.environment }}.tfplan
