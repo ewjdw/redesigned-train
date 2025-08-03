@@ -15,7 +15,7 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
     -U $env:AZURE_CLIENT_ID `
     -P $env:AZURE_CLIENT_SECRET `
     -Q $sqlCommand `
-    --authentication-method ActiveDirectoryServicePrincipal `
+    --authentication-method ActiveDirectoryServicePrincipal
 
 }
 catch {
