@@ -30,5 +30,5 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 
 }
 catch {
-  Throw "An error occurred while creating or updating the database"
+  throw $LASTEXITCODE
 }

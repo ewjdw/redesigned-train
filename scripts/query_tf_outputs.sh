@@ -1,15 +1,13 @@
 set -e
 
-terraform output -json > terraform_output.json
+echo "Setting up sql_fqdn"
+SQL_FQDN=$(terraform output -raw sql_server_fqdn)
+echo "sql_fqdn=$SQL_FQDN" >> $GITHUB_OUTPUT
 
-declare -A tf_vars=(
-[SQL_FQDN]=sql_server_fqdn
-[SQL_DB]=sql_database_name
-[APP_PRINCIPAL_ID]=app_service_principal_id
-)
+echo "Setting up sql_db"
+SQL_DB=$(terraform output -raw sql_database_name)
+echo "sql_db=$SQL_DB" >> $GITHUB_OUTPUT
 
-for var_name in "${!tf_vars[@]}"; do
-tf_output="${tf_vars[$var_name]}"
-var_value=$(jq -r .${tf_output}.value terraform_output.json)
-echo "$var_name=$var_value" >> $GITHUB_ENV
-done
+echo "Setting up app_principal_id"
+APP_PRINCIPAL_ID=$(terraform output -raw app_service_principal_id)
+echo "app_principal_id=$APP_PRINCIPAL_ID" >> $GITHUB_OUTPUT
