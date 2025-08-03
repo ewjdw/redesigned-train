@@ -3,9 +3,9 @@ set -e
 terraform output -json > terraform_output.json
 
 declare -A tf_vars=(
-[SQL_FQDN]=sql_server_fqdn
-[SQL_DB]=sql_database_name
-[APP_PRINCIPAL_ID]=app_service_principal_id
+[sql_fqdn]=sql_server_fqdn
+[sql_db]=sql_database_name
+[app_principal_id]=app_service_principal_id
 )
 
 for var_name in "${!tf_vars[@]}"; do
