@@ -99,13 +99,14 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
       TF_VAR_sql_admin_login: ${{ inputs.sql_admin_login }}
       TF_VAR_sql_admin_password: ${{ secrets.sql_admin_password }}
+      SCRIPTS_PATH: ../scripts
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Install SQLCMD
-        run: bash ../install_sqlcmd.sh
+        run: bash ${{ env.SCRIPTS_PATH }}/install_sqlcmd.sh
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -133,7 +134,7 @@ jobs:
 
       - name: Get Terraform output
         id: tf_output
-        run: bash ../scripts/get_terraform_output.sh
+        run: bash ${{ env.SCRIPTS_PATH }}/get_terraform_output.sh
       
       - name: Create or update DB user
         env:
@@ -146,4 +147,4 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
           AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-        run: bash ../scripts/create_or_update_db_user.sh
+        run: bash ${{ env.SCRIPTS_PATH }}/create_or_update_db_user.sh
