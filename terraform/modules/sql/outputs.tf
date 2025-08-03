@@ -6,7 +6,7 @@ output "fqdn" {
 
 output "database_name" {
   description = "The name of the SQL database"
-  value       = azurerm_sql_database.rtrain_sql_database.name
+  value       = azurerm_mssql_database.rtrain_sql_database.name
   
 }
 
