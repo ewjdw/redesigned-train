@@ -59,28 +59,3 @@ resource "azurerm_role_assignment" "appservice_acr_pull" {
   
 }
 
-resource "null_resource" "sql_add_ad_user" {
-  depends_on = [module.sql, module.appservice]
-  
-  provisioner "local-exec" {
-    command = <<EOT
-      az sql db user create \
-      --resource-group ${azurerm_resource_group.rtrain_rg.name} \
-      --server ${module.sql.sql_server_name} \
-      --display-name "${module.appservice.app_service_name}" \
-      --object-id ${module.appservice.app_service_principal_id} \
-      --role db_datareader,db_datawriter
-    EOT
-    environment = {
-      SQL_ADMIN_LOGIN = var.sql_admin_login
-      SQL_ADMIN_PASSWORD = var.sql_admin_password
-      AZURE_SUBSCRIPTION_ID = var.subscription_id
-      AZURE_TENANT_ID = var.azure_tenant_id
-    }
-  }
-  
-  triggers = {
-    sql_server_name = module.sql.sql_server_name
-  }
-  
-}
