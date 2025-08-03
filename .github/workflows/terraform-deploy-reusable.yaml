@@ -104,6 +104,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install SQLCMD
+        run: bash ../install_sqlcmd.sh
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -130,20 +133,7 @@ jobs:
 
       - name: Get Terraform output
         id: tf_output
-        run: |
-          terraform output -json > terraform_output.json
-
-          declare -A tf_vars=(
-            [SQL_FQDN]=sql_server_fqdn
-            [SQL_DB]=sql_database_name
-            [APP_PRINCIPAL_ID]=app_service_principal_id
-          )
-          
-          for var_name in "${!tf_vars[@]}"; do
-            tf_output="${tf_vars[$var_name]}"
-            var_value=$(jq -r .${tf_output}.value terraform_output.json)
-            echo "$var_name=$var_value" >> $GITHUB_ENV
-          done
+        run: bash ../scripts/get_terraform_output.sh
       
       - name: Create or update DB user
         env:
@@ -156,5 +146,4 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
           AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-        run: |
-          bash ../scripts/create_or_update_db_user.sh
+        run: bash ../scripts/create_or_update_db_user.sh
