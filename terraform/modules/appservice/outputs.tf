@@ -1,6 +1,6 @@
 output "default_site_hostname" {
   description = "The URL of the deployed App Service"
-  value       = azurerm_linux_web_app.rtrain_app_service.default_site_hostname
+  value       = azurerm_linux_web_app.rtrain_app_service.default_hostname
   
 }
 
