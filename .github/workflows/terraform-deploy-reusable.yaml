@@ -127,3 +127,34 @@ jobs:
 
       - name: Apply Terraform deployment
         run: terraform apply -auto-approve tf-plan-${{ inputs.environment }}.tfplan
+
+      - name: Get Terraform output
+        id: tf_output
+        run: |
+          terraform output -json > terraform_output.json
+
+          declare -A tf_vars=(
+            [SQL_FQDN]=sql_server_fqdn
+            [SQL_DB]=sql_database_name
+            [APP_PRINCIPAL_ID]=app_service_principal_id
+          )
+          
+          for var_name in "${!tf_vars[@]}"; do
+            tf_output="{tf_vars[$var_name]}"
+            var_value=$(jq -r ".${tf_output}.value" terraform_output.json)
+            echo "$var_name=$var_value" >> $GITHUB_ENV
+          done
+      
+      - name: Create or update DB user
+        env:
+          SQL_ADMIN_LOGIN: ${{ inputs.sql_admin_login }}
+          SQL_ADMIN_PASSWORD: ${{ secrets.sql_admin_password }}
+          SQL_FQDN: ${{ env.SQL_FQDN }}
+          SQL_DB: ${{ env.SQL_DB }}
+          APP_PRINCIPAL_ID: ${{ env.APP_PRINCIPAL_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.azure_client_id }}
+          AZURE_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
+        run: |
+          bash ../scripts/create_or_update_db_user.sh

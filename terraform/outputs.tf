@@ -15,3 +15,14 @@ output "acr_login_server" {
   value       = azurerm_container_registry.rtrain_acr.login_server
   
 }
+
+output "app_service_principal_id" {
+  description = "The principal ID of the App Service"
+  value       = module.appservice.app_service_principal_id
+  
+}
+
+output "sql_database_name" {
+  description = "SQL database name"
+  value       = module.sql.database_name
+}
