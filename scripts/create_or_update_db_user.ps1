@@ -17,6 +17,12 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
     -Q $sqlCommand `
     --authentication-method ActiveDirectoryServicePrincipal
 
+  if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to create or update database user."
+    exit $LASTEXITCODE
+  } else {
+    Write-Host "Database user created or updated successfully."
+  }
 }
 catch {
   throw $LASTEXITCODE
