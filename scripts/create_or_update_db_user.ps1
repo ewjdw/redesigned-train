@@ -11,9 +11,7 @@ try {
 
   az account set --subscription $env:AZURE_SUBSCRIPTION_ID
 
-  write-host "fqdn: $($env:SQL_FQDN)"
-  write-host "db: $($env:SQL_DB)"
-  write-host "app principal id: $($env:APP_PRINCIPAL_ID)"
+  $accessToken = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
 
   $sqlCommand = @"
 DROP USER IF EXISTS [$($env:APP_PRINCIPAL_ID)];
@@ -24,8 +22,8 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 
   sqlcmd -S $env:SQL_FQDN `
     -d $env:SQL_DB `
-    -U $env:SQL_ADMIN_LOGIN `
-    -P $env:SQL_ADMIN_PASSWORD `
+    -G `
+    -P $accessToken `
     -Q $sqlCommand
 
 }
