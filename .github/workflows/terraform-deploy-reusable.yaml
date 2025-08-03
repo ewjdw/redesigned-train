@@ -7,10 +7,6 @@ on:
         description: "The environment to deploy to (e.g., dev, prod)"
         required: true
         type: string
-      sql_admin_login:
-        description: "SQL Admin Login for the database"
-        required: true
-        type: string
     secrets:
       azure_credentials:
         description: "Azure Credentials for authentication"
@@ -21,8 +17,8 @@ on:
       azure_client_id:
         description: "Azure Client ID for authentication"
         required: true
-      sql_admin_password:
-        description: "SQL Admin Password for the database"
+      spn_config:
+        description: "SPN configuration for the deployment"
         required: true
 
 jobs:
@@ -38,8 +34,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
       ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-      TF_VAR_sql_admin_login: ${{ inputs.sql_admin_login }}
-      TF_VAR_sql_admin_password: ${{ secrets.sql_admin_password }}
+      TF_VAR_spn: ${{ secrets.spn_config }}
 
     steps:
       - name: Checkout code
@@ -101,8 +96,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.azure_client_secret }}
       ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ vars.SUBSCRIPTION_ID }}
-      TF_VAR_sql_admin_login: ${{ inputs.sql_admin_login }}
-      TF_VAR_sql_admin_password: ${{ secrets.sql_admin_password }}
+      TF_VAR_spn: ${{ secrets.spn_config }}
 
     steps:
       - name: Checkout code
@@ -137,12 +131,6 @@ jobs:
         run: |
           terraform output -json
           bash ../scripts/query_tf_outputs.sh
-      
-      - name: Debug TF outputs
-        run: |
-          echo "SQL FQDN: ${{ steps.tf_output.outputs.sql_fqdn }}"
-          echo "SQL DB: ${{ steps.tf_output.outputs.sql_db }}"
-          echo "App Principal ID: ${{ steps.tf_output.outputs.app_principal_id }}"
 
   setup-database:
     name: "Setup Database User - ${{ inputs.environment }}"
@@ -164,16 +152,8 @@ jobs:
         with:
           creds: ${{ secrets.azure_credentials }}
 
-      - name: Debug job outputs
-        run: |
-          Write-Host "SQL FQDN: ${{ needs.terraform-apply.outputs.sql_fqdn }}"
-          Write-Host "SQL DB: ${{ needs.terraform-apply.outputs.sql_db }}"
-          Write-Host "App Principal ID: ${{ needs.terraform-apply.outputs.app_principal_id }}"
-          
       - name: Get terraform outputs
         env:
-          SQL_ADMIN_LOGIN: ${{ inputs.sql_admin_login }}
-          SQL_ADMIN_PASSWORD: ${{ secrets.sql_admin_password }}
           SQL_FQDN: ${{ needs.terraform-apply.outputs.sql_fqdn }}
           SQL_DB: ${{ needs.terraform-apply.outputs.sql_db }}
           APP_PRINCIPAL_ID: ${{ needs.terraform-apply.outputs.app_principal_id }}

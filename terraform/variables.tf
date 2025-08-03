@@ -34,20 +34,16 @@ variable "acr_sku" {
   
 }
 
-variable "sql_admin_password" {
-  description = "The administrator password for the SQL server"
-  type        = string
-  sensitive   = true
+variable "spn" {
+  description = "Service Principal details for the deployment"
+  type = object({
+    display_name = string
+    object_id    = string
+  })
   
 }
 
-variable "sql_admin_login" {
-  description = "The administrator login for the SQL server"
-  type        = string
-  
-}
-
-variable "sql_config" {
+variable "db_config" {
   description = "Configuration for SQL resources including database SKU and storage account type"
   type        = object({
     database_sku_name    = string

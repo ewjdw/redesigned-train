@@ -5,7 +5,7 @@ subscription_id = "#{subscriptionId}#"
 azure_tenant_id = "#{azureTenantId}#"
 acr_sku = "Basic"
 
-sql_config = {
+db_config = {
   database_sku_name  = "Basic"
   storage_account_type = "Local"
 }

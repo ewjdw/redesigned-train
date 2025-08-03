@@ -28,16 +28,15 @@ variable "sql_server_name" {
   
 }
 
-variable "administrator_login" {
-  description = "The administrator login for the SQL server"
+variable "object_id" {
+  description = "The object ID of the Azure AD administrator for the SQL server"
   type        = string
   
 }
 
-variable "administrator_password" {
-  description = "The administrator password for the SQL server"
+variable "display_name" {
+  description = "The display name of the Azure AD administrator for the SQL server"
   type        = string
-  sensitive   = true
   
 }
 

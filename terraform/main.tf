@@ -32,10 +32,10 @@ module "sql" {
   workload = var.workload
   resource_group_name = azurerm_resource_group.rtrain_rg.name
   sql_server_name = "sql${var.workload}${var.environment}"
-  administrator_login = var.sql_admin_login
-  administrator_password = var.sql_admin_password
-  database_sku_name = var.sql_config.database_sku_name
-  storage_account_type = var.sql_config.storage_account_type
+  display_name = var.spn.display_name
+  object_id = var.spn.object_id
+  database_sku_name = var.db_config.database_sku_name
+  storage_account_type = var.db_config.storage_account_type
   tags = local.tags
 }
 

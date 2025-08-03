@@ -9,8 +9,12 @@ resource "azurerm_mssql_server" "rtrain_sql_server" {
   resource_group_name          = var.resource_group_name
   location                     = var.location
   version                      = "12.0"
-  administrator_login          = var.administrator_login
-  administrator_login_password = var.administrator_password
+
+  azuread_administrator {
+    login_username              = var.display_name
+    object_id                   = var.object_id
+    azuread_authentication_only = true
+  }
 
   tags = local.tags
   
