@@ -11,3 +11,7 @@ echo "sql_db=$SQL_DB" >> $GITHUB_OUTPUT
 echo "Setting up app_principal_id"
 APP_PRINCIPAL_ID=$(terraform output -raw app_service_principal_id)
 echo "app_principal_id=$APP_PRINCIPAL_ID" >> $GITHUB_OUTPUT
+
+echo "Setting up sql_principal_id"
+SQL_PRINCIPAL_ID=$(terraform output -raw sql_principal_id)
+echo "sql_principal_id=$SQL_PRINCIPAL_ID" >> $GITHUB_OUTPUT
