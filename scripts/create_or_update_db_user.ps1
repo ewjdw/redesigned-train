@@ -12,15 +12,17 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 
   az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID
   $accessToken = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
-  Invoke-Sqlcmd -Query $sqlCommand -ServerInstance $env:SQL_FQDN -Database $env:SQL_DB -AccessToken $accessToken
-
-  if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create or update database user."
-    exit $LASTEXITCODE
-  } else {
-    Write-Host "Database user created or updated successfully."
+  
+  try {
+    Invoke-Sqlcmd -Query $sqlCommand -ServerInstance $env:SQL_FQDN -Database $env:SQL_DB -AccessToken $accessToken
   }
+  catch {
+    Write-Error "invoke-sqlcmd failed: $($_.Exception.Message)"
+    exit 1
+  }
+
 }
 catch {
-  throw $LASTEXITCODE
+  Write-Error "$($_.Exception.Message)"
+  exit 1
 }
