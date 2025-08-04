@@ -45,7 +45,7 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
 
 resource "azurerm_role_assignment" "sql_directory_reader" {
   scope                = "/"
-  role_definition_name = "Directory Readers"
+  role_definition_id = "/providers/Microsoft.Authorization/roleDefinitions/88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
   principal_id         = azurerm_mssql_server.rtrain_sql_server.identity[0].principal_id
   
 }
