@@ -26,3 +26,9 @@ output "sql_database_name" {
   description = "SQL database name"
   value       = module.sql.database_name
 }
+
+output "sql_principal_id" {
+  description = "The principal ID of the SQL server's system-assigned identity"
+  value       = module.sql.sql_principal_id
+  
+}

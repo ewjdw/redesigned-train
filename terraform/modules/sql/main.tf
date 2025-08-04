@@ -16,6 +16,10 @@ resource "azurerm_mssql_server" "rtrain_sql_server" {
     azuread_authentication_only = true
   }
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = local.tags
   
 }
@@ -30,6 +34,7 @@ resource "azurerm_mssql_database" "rtrain_sql_database" {
   tags = local.tags
 
 }
+
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   name                = "AllowAzureServices"
   server_id = azurerm_mssql_server.rtrain_sql_server.id

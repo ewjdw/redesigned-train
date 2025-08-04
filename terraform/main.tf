@@ -58,3 +58,10 @@ resource "azurerm_role_assignment" "appservice_acr_pull" {
   principal_id         = module.appservice.app_service_principal_id
   
 }
+
+resource "azurerm_role_assignment" "spn_acr_push" {
+  scope                = azurerm_container_registry.rtrain_acr.id
+  role_definition_name = "AcrPush"
+  principal_id         = var.spn.object_id
+  
+}

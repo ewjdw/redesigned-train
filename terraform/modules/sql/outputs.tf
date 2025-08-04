@@ -15,3 +15,9 @@ output "sql_server_name" {
   value       = azurerm_mssql_server.rtrain_sql_server.name
   
 }
+
+output "sql_principal_id" {
+  description = "The principal ID of the SQL server's system-assigned identity"
+  value       = azurerm_mssql_server.rtrain_sql_server.identity[0].principal_id
+  
+}
