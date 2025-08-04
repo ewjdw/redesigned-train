@@ -10,7 +10,7 @@ ALTER ROLE db_datareader ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
 "@
 
-  sqlcmd -S $env:SQL_FQDN -d $env:SQL_DB --authentication-method ActiveDirectoryServicePrincipal -U $env:AZURE_CLIENT_ID -P $env:AZURE_CLIENT_SECRET
+  sqlcmd -S $($env:SQL_FQDN) -d $($env:SQL_DB) --authentication-method ActiveDirectoryServicePrincipal -U $($env:AZURE_CLIENT_ID) -P $($env:AZURE_CLIENT_SECRET)
 
   if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to create or update database user."
