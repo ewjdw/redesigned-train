@@ -13,7 +13,7 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
   $sqlcmdArguments = @(
     "-S", "$($env:SQL_FQDN)",
     "-d", "$($env:SQL_DB)",
-    "-authentication-method", "ActiveDirectoryServicePrincipal",
+    "--authentication-method", "ActiveDirectoryServicePrincipal",
     "-U", "$($env:AZURE_CLIENT_ID)",
     "-P", "$($env:AZURE_CLIENT_SECRET)",
     "-Q", $sqlCommand
