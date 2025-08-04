@@ -14,7 +14,7 @@ ALTER ROLE db_datawriter ADD MEMBER [$($env:APP_PRINCIPAL_ID)];
   $accessToken = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
 
   try {
-    az role assignment create --assignee $env:SQL_PRINCIPAL_ID --role "Directory Readers" --scope "/"
+    az role assignment create --assignee $env:SQL_PRINCIPAL_ID --role "88d8e3e3-8f55-4a1e-953a-9b9898b8876b" --scope "/"
     Start-Sleep -Seconds 30
   }
   catch {
