@@ -42,3 +42,10 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   end_ip_address      = "0.0.0.0"
   
 }
+
+resource "azurerm_role_assignment" "sql_directory_reader" {
+  scope                = "/"
+  role_definition_name = "Directory Readers"
+  principal_id         = azurerm_mssql_server.rtrain_sql_server.identity[0].principal_id
+  
+}
