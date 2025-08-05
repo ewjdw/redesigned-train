@@ -7,7 +7,11 @@ try {
   $accessToken = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
 
   $connTest = "SELECT SYSTEM_USER as CurrentUser, USER_NAME() as DatabaseUser, ORIGINAL_LOGIN() as OriginalLogin;"
-  Invoke-Sqlcmd -Query $connTest -ServerInstance $env:SQL_FQDN -Database $env:SQL_DB -AccessToken $accessToken
+  $connRsult = Invoke-Sqlcmd -Query $connTest -ServerInstance $env:SQL_FQDN -Database $env:SQL_DB -AccessToken $accessToken
+
+  Write-Host "Current User: $($connRsult.CurrentUser)"
+  Write-Host "Database User: $($connRsult.DatabaseUser)"
+  Write-Host "Original Login: $($connRsult.OriginalLogin)"
 
   $sqlCommand = @"
 DROP USER IF EXISTS [$($env:APP_PRINCIPAL_ID)];
