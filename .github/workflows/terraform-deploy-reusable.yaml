@@ -127,10 +127,9 @@ jobs:
       - name: Apply Terraform deployment
         run: terraform apply -auto-approve tf-plan-${{ inputs.environment }}.tfplan
 
-      - name: Get Terraform output
+      - name: Set vars from Terraform output
         id: tf_output
         run: |
-          terraform output -json
           bash ../scripts/query_tf_outputs.sh
 
   setup-database:
