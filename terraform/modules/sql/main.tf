@@ -24,6 +24,12 @@ resource "azurerm_mssql_server" "rtrain_sql_server" {
   
 }
 
+resource "azuread_directory_role_assignment" "sql_directory_reader" {
+  role_id = "88d8e3e3-8f55-4a1e-953a-9b9898b8876b" # Directory Readers
+  principal_object_id = azurerm_mssql_server.rtrain_sql_server.identity[0].principal_id
+
+}
+
 resource "azurerm_mssql_database" "rtrain_sql_database" {
   name                = "db-${var.workload}-${var.environment}"
   server_id = azurerm_mssql_server.rtrain_sql_server.id
@@ -42,4 +48,3 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   end_ip_address      = "0.0.0.0"
   
 }
-
