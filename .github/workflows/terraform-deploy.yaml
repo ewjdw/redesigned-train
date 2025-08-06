@@ -1,0 +1,21 @@
+name: Terraform Deploy Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - terraform_initial_structure
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy-dev:
+    uses: ./.github/workflows/terraform-deploy-reusable.yaml
+    with:
+      environment: dev
+    secrets:
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+      azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+      spn_config: ${{ secrets.SPN_CONFIG_DEV }}
