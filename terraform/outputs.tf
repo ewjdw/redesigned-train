@@ -16,9 +16,9 @@ output "acr_login_server" {
   
 }
 
-output "app_service_principal_id" {
+output "app_service_name" {
   description = "The principal ID of the App Service"
-  value       = module.appservice.app_service_principal_id
+  value       = module.appservice.app_service_name
   
 }
 
