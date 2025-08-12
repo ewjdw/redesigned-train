@@ -40,4 +40,9 @@ dotnet run --project TodoApi
 
 # Application runs on http://localhost:5293
 # Test: curl http://localhost:5293/health
+# POST with curl: curl -X POST http://localhost:5293/api/todos -H "Content-Type: application/json" -d "{\"title\":\"My first todo\"}"
+# Post with PS: Invoke-WebRequest -Uri "http://localhost:5293/api/todos" -Method POST -ContentType "application/json" -Body '{"title":"My first todo"}'
+# GET all todos: curl http://localhost:5293/api/todos
+# GET todo by id: Invoke-WebRequest -Uri "http://localhost:5293/api/todos/1"
+# PUT todo 1: curl -X PUT http://localhost:5293/api/todos/1 -H "Content-Type: application/json" -d "{\"isCompleted\":true}"
 ```
