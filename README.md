@@ -46,3 +46,10 @@ dotnet run --project TodoApi
 # GET todo by id: Invoke-WebRequest -Uri "http://localhost:5293/api/todos/1"
 # PUT todo 1: curl -X PUT http://localhost:5293/api/todos/1 -H "Content-Type: application/json" -d "{\"isCompleted\":true}"
 ```
+
+### Testing
+
+```bash
+cd src/TodoApi.Tests
+dotnet test
+```
