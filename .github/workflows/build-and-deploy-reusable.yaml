@@ -1,0 +1,108 @@
+name: "Deploy Application"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The environment to deploy to (e.g., dev, prod)"
+        required: true
+        type: string
+      image-tag:
+        description: "The Docker image tag to deploy"
+        required: true
+        type: string
+      image-name:
+        description: "The Docker image name to deploy"
+        required: true
+        type: string
+
+jobs:
+  deploy-app:
+    name: "Deploy to ${{ inputs.environment }}"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      ENV: ${{ inputs.environment }}
+      BACKEND_STORAGE: ${{ vars.BACKEND_STORAGE_ACCOUNT }}
+
+    steps:
+      - name: Login to Azure with Service Principal
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Extract Terraform outputs for environment
+        id: terraform-vars
+        run: |
+          cd terraform
+
+          BACKEND_KEY="terraform-${ENV}.tfstate"
+
+          echo "Initializing Terraform backend for environment: $ENV"
+          terraform init \
+            -backend-config="resource_group_name=rg-tfstate-shared" \
+            -backend-config="storage_account_name=$BACKEND_STORAGE" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=$BACKEND_KEY"
+
+          echo "Fetching Terraform outputs for environment: $ENV"
+          TERRAFORM_OUTPUTS=$(terraform output -json)
+
+          ACR_SERVER=$(echo $TERRAFORM_OUTPUTS | jq -r ".acr_server.value")
+          APP_SERVICE=$(echo $TERRAFORM_OUTPUTS | jq -r ".app_service.value")
+
+          echo "acr-server=$ACR_SERVER" >> $GITHUB_OUTPUT
+          echo "app-service=$APP_SERVICE" >> $GITHUB_OUTPUT
+
+      - name: Login to Azure Container Registry
+        run: |
+          ACR_SERVER="${{ steps.terraform-vars.outputs.acr-server }}"
+          echo "Logging into ACR: $ACR_SERVER"
+          az acr login --name $ACR_SERVER
+
+      - name: Tag and Push to Environment ACR
+        run: |
+          IMAGE_TAG="${{ inputs.image-tag }}"
+          IMAGE_NAME="${{ inputs.image-name }}"
+          ACR_SERVER="${{ steps.terraform-vars.outputs.acr-server }}"
+
+          echo "Tagging image for $ENV environment..."
+          docker tag $IMAGE_NAME:$IMAGE_TAG $ACR_SERVER/$IMAGE_NAME:$IMAGE_TAG
+
+          echo "Pushing image to Terraform-managed ACR: $ACR_SERVER"
+          docker push $ACR_SERVER/$IMAGE_NAME:$IMAGE_TAG
+
+      - name: Deploy to App Service
+        run: |
+          ACR_SERVER="${{ steps.terraform-vars.outputs.acr-server }}"
+          APP_SERVICE="${{ steps.terraform-vars.outputs.app-service }}"
+          IMAGE_TAG="${{ inputs.image-tag }}"
+          IMAGE_NAME="${{ inputs.image-name }}"
+
+          echo "Deploying to Terraform-managed App Service: $APP_SERVICE"
+          echo "Using image: $ACR_SERVER/$IMAGE_NAME:$IMAGE_TAG"
+
+          az webapp config container set \
+            --name $APP_SERVICE \
+            --resource-group "rg-rtrainapp-$ENV" \
+            --docker-custom-image-name "$ACR_SERVER/$IMAGE_NAME:$IMAGE_TAG"
+
+          az webapp restart --name $APP_SERVICE --resource-group "rg-rtrainapp-$ENV"
+
+      - name: Test Database Connection
+        run: |
+          APP_SERVICE="${{ steps.terraform-vars.outputs.app-service }}"
+          APP_URL="https://$APP_SERVICE.azurewebsites.net"
+
+          echo "Testing database connection for $ENV environment..."
+
+          RESPONSE=$(curl -s -w "%{http_code}" "$APP_URL/api/todos")
+          BODY=$(echo "$RESPONSE" | head -c -3)
+          STATUS=$(echo "$RESPONSE" | tail -c 3)
+
+          if [ "$STATUS" -eq 200 ] && echo "$BODY" | jq -e 'type=="array"' > /dev/null 2>&1; then
+            echo "Database connectivity test is successful and endpoint returned valid data"
+          else
+            echo "Database connectivity test failed or endpoint did not return valid data"
+            exit 1
+          fi

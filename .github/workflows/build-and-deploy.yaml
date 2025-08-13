@@ -1,0 +1,100 @@
+name: "Build and Deploy Application"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [deploy_app]
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: "Build and Test Application"
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.metadata.outputs.image-tag }}
+      image-name: ${{ steps.metadata.outputs.image-name }}
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Generate image metadata
+        id: metadata
+        run: |
+          IMAGE_TAG="v${{ github.run_number }}-${{ github.sha }}"
+          IMAGE_NAME="todo-api"
+          echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build application
+        run: dotnet build TodoApi/TodoApi.csproj --configuration Release
+        
+      - name: Test application
+        run: dotnet test TodoApi/TodoApi.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Publish application
+        run: dotnet publish TodoApi/TodoApi.csproj --configuration Release --output ./publish
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-build-${{ steps.metadata.outputs.image-tag }}
+          path: src/publish
+
+  build-docker-image:
+    name: "Build Docker Image"
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    outputs:
+      image-tag: ${{ needs.build-and-test.outputs.image-tag }}
+      image-name: ${{ needs.build-and-test.outputs.image-name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: api-build-${{ needs.build-and-test.outputs.image-tag }}
+          path: src/publish
+
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG="${{ needs.build-and-test.outputs.image-tag }}"
+          IMAGE_NAME="${{ needs.build-and-test.outputs.image-name }}"
+          echo "Building Docker image..."
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          echo "Successfully built $IMAGE_NAME:$IMAGE_TAG"
+
+      - name: Save Docker image
+        run: |
+          IMAGE_TAG="${{ needs.build-and-test.outputs.image-tag }}"
+          IMAGE_NAME="${{ needs.build-and-test.outputs.image-name }}"
+          docker save $IMAGE_NAME:$IMAGE_TAG | gzip > docker-image.tar.gz
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ needs.build-and-test.outputs.image-tag }}
+          path: docker-image.tar.gz
+
+  deploy-dev:
+    name: "Deploy to Development"
+    needs: [build-and-test, build-docker-image]
+    uses: ./.github/workflows/build-and-deploy-reusable.yaml
+    with:
+      environment: dev
+      image-tag: ${{ needs.build-and-test.outputs.image-tag }}
+      image-name: ${{ needs.build-and-test.outputs.image-name }}
+      
