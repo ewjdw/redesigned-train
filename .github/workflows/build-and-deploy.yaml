@@ -31,7 +31,7 @@ jobs:
       - name: Generate image metadata
         id: metadata
         run: |
-          IMAGE_TAG="v${{ github.run_number }}"
+          IMAGE_TAG="v${{ github.run_number }}-${{ github.sha }}"
           IMAGE_NAME="todo-api"
           echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
           echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
@@ -50,4 +50,42 @@ jobs:
         with:
           name: api-build-${{ steps.metadata.outputs.image-tag }}
           path: src/publish
+
+  build-docker-image:
+    name: "Build Docker Image"
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    outputs:
+      image-tag: ${{ needs.build-and-test.outputs.image-tag }}
+      image-name: ${{ needs.build-and-test.outputs.image-name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: api-build-${{ needs.build-and-test.outputs.image-tag }}
+          path: src/publish
+
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG="${{ needs.build-and-test.outputs.image-tag }}"
+          IMAGE_NAME="${{ needs.build-and-test.outputs.image-name }}"
+          echo "Building Docker image..."
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          echo "Successfully built $IMAGE_NAME:$IMAGE_TAG"
+
+      - name: Save Docker image
+        run: |
+          IMAGE_TAG="${{ needs.build-and-test.outputs.image-tag }}"
+          IMAGE_NAME="${{ needs.build-and-test.outputs.image-name }}"
+          docker save $IMAGE_NAME:$IMAGE_TAG | gzip > docker-image.tar.gz
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ needs.build-and-test.outputs.image-tag }}
+          path: docker-image.tar.gz
           
