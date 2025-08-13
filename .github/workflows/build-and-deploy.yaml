@@ -1,0 +1,53 @@
+name: "Build and Deploy Application"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [deploy_app]
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: "Build and Test Application"
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.metadata.outputs.image-tag }}
+      image-name: ${{ steps.metadata.outputs.image-name }}
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Generate image metadata
+        id: metadata
+        run: |
+          IMAGE_TAG="v${{ github.run_number }}"
+          IMAGE_NAME="todo-api"
+          echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image-name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build application
+        run: dotnet build TodoApi/TodoApi.csproj --configuration Release
+        
+      - name: Test application
+        run: dotnet test TodoApi/TodoApi.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Publish application
+        run: dotnet publish TodoApi/TodoApi.csproj --configuration Release --output ./publish
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-build-${{ steps.metadata.outputs.image-tag }}
+          path: src/publish
+          
