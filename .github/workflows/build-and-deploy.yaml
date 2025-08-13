@@ -88,4 +88,13 @@ jobs:
         with:
           name: docker-image-${{ needs.build-and-test.outputs.image-tag }}
           path: docker-image.tar.gz
-          
+
+  deploy-dev:
+    name: "Deploy to Development"
+    needs: [build-and-test, build-docker-image]
+    uses: ./.github/workflows/build-and-deploy-reusable.yaml
+    with:
+      environment: dev
+      image-tag: ${{ needs.build-and-test.outputs.image-tag }}
+      image-name: ${{ needs.build-and-test.outputs.image-name }}
+      
