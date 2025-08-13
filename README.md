@@ -1,4 +1,4 @@
-# TodoApp - REST API with Azure Deployment
+# TodoApi - REST API with Azure Deployment
 
 A lightweight Todo REST API built with .NET 9, designed for cloud deployment with Infrastructure-as-Code.
 
