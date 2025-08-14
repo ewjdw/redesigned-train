@@ -3,7 +3,7 @@ workload = "rtrainapp"
 environment = "#{environment}#"
 subscription_id = "#{subscriptionId}#"
 azure_tenant_id = "#{azureTenantId}#"
-acr_sku = "Basic"
+acr_sku = "Premium"
 
 db_config = {
   database_sku_name  = "Basic"
@@ -11,3 +11,4 @@ db_config = {
 }
 
 app_service_plan_sku_name = "B1"
+vnet_range = "[10.0.0.0/25]"

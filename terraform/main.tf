@@ -25,6 +25,27 @@ resource "azurerm_container_registry" "rtrain_acr" {
   
 }
 
+resource "azurerm_private_endpoint" "acr_pep" {
+
+  name                = "pep-${azurerm_container_registry.acr.name}"
+  resource_group_name = azurerm_resource_group.rtrain_rg.name
+  location            = azurerm_resource_group.rtrain_rg.location
+
+  subnet_id = azurerm_subnet.subnet["snet-${var.workload}-${var.environment}-data"].id
+
+  private_service_connection {
+    name                           = "pep-${azurerm_container_registry.acr.name}"
+    private_connection_resource_id = azurerm_container_registry.acr.id
+    subresource_names              = ["registry"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = data.azurerm_private_dns_zone.dns_zone["acr"].name
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.dns_zone["acr"].id]
+  }
+}
+
 module "sql" {
   source = "./modules/sql"
   environment = var.environment
@@ -36,6 +57,8 @@ module "sql" {
   object_id = var.spn.object_id
   database_sku_name = var.db_config.database_sku_name
   storage_account_type = var.db_config.storage_account_type
+  subnet_id = azurerm_subnet.subnet["snet-${var.workload}-${var.environment}-data"].id
+  dns_zone_id = data.azurerm_private_dns_zone.dns_zone["sql-database"].id
   tags = local.tags
 }
 
@@ -49,6 +72,8 @@ module "appservice" {
   sql_server_fqdn = module.sql.fqdn
   sql_database_name = module.sql.database_name
   sku_name = var.app_service_plan_sku_name
+  subnet_id = azurerm_subnet.subnet["snet-${var.workload}-${var.environment}-data"].id
+  dns_zone_id = data.azurerm_private_dns_zone.dns_zone["app-service"].id
   tags = local.tags  
 }
 

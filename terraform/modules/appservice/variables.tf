@@ -53,3 +53,21 @@ variable "sql_database_name" {
   
 }
 
+variable "subnet_id" {
+  description = "The ID of the subnet where the App Service will be deployed"
+  type        = string
+  
+}
+
+variable "dns_zone_name" {
+  description = "The name of the private DNS zone for the App Service"
+  type        = string
+  default = "privatelink.azurewebsites.net"
+  
+}
+
+variable "dns_zone_id" {
+  description = "The ID of the private DNS zone for the App Service"
+  type        = string
+  
+}

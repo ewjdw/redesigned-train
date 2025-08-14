@@ -58,3 +58,22 @@ variable "storage_account_type" {
   type        = string
   
 }
+
+variable "subnet_id" {
+  description = "The ID of the subnet where the private endpoint will be created"
+  type        = string
+  
+}
+
+variable "dns_zone_id" {
+  description = "The name of the private DNS zone ID for SQL"
+  type        = string
+  
+}
+
+variable "dns_zone_name" {
+  description = "The name of the private DNS zone name for SQL"
+  type        = string
+  default     = "privatelink.database.windows.net"
+  
+}
