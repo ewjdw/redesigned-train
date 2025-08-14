@@ -59,15 +59,28 @@ variable "subnet_id" {
   
 }
 
-variable "dns_zone_name" {
+variable "app_dns_zone_name" {
   description = "The name of the private DNS zone for the App Service"
   type        = string
   default = "privatelink.azurewebsites.net"
   
 }
 
-variable "dns_zone_id" {
+variable "app_dns_zone_id" {
   description = "The ID of the private DNS zone for the App Service"
+  type        = string
+  
+}
+
+variable "scm_dns_zone_name" {
+  description = "The name of the private DNS zone for the SCM (Kudu) endpoint"
+  type        = string
+  default = "scm.privatelink.azurewebsites.net"
+  
+}
+
+variable "scm_dns_zone_id" {
+  description = "The ID of the private DNS zone for the SCM (Kudu) endpoint"
   type        = string
   
 }

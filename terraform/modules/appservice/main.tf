@@ -50,7 +50,27 @@ resource "azurerm_private_endpoint" "app_pep" {
   }
 
   private_dns_zone_group {
-    name                 = var.dns_zone_name
-    private_dns_zone_ids = [var.dns_zone_id]
+    name                 = var.app_dns_zone_name
+    private_dns_zone_ids = [var.app_dns_zone_id]
+  }
+}
+
+resource "azurerm_private_endpoint" "app_scm_pep" {
+  name                = "pep-${azurerm_linux_web_app.rtrain_app_service.name}-scm"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  subnet_id = var.subnet_id
+
+  private_service_connection {
+    name                           = "pep-${azurerm_linux_web_app.rtrain_app_service.name}-scm"
+    private_connection_resource_id = azurerm_linux_web_app.rtrain_app_service.id
+    subresource_names              = ["scm"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = var.scm_dns_zone_name
+    private_dns_zone_ids = [var.scm_dns_zone_id]
   }
 }

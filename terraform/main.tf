@@ -73,7 +73,8 @@ module "appservice" {
   sql_database_name = module.sql.database_name
   sku_name = var.app_service_plan_sku_name
   subnet_id = azurerm_subnet.subnet["snet-${var.workload}-${var.environment}-data"].id
-  dns_zone_id = data.azurerm_private_dns_zone.dns_zone["app-service"].id
+  app_dns_zone_id = data.azurerm_private_dns_zone.dns_zone["app-service"].id
+  scm_dns_zone_id = data.azurerm_private_dns_zone.dns_zone["scm-app-service"].id
   tags = local.tags  
 }
 
