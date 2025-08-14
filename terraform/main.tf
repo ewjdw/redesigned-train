@@ -13,11 +13,12 @@ resource "azurerm_resource_group" "rtrain_rg" {
 }
 
 resource "azurerm_container_registry" "rtrain_acr" {
-  name                = "acr${var.workload}${var.environment}"
-  resource_group_name = azurerm_resource_group.rtrain_rg.name
-  location            = azurerm_resource_group.rtrain_rg.location
-  sku                 = var.acr_sku
-  admin_enabled       = false
+  name                          = "acr${var.workload}${var.environment}"
+  resource_group_name           = azurerm_resource_group.rtrain_rg.name
+  location                      = azurerm_resource_group.rtrain_rg.location
+  sku                           = var.acr_sku
+  admin_enabled                 = false
+  public_network_access_enabled = false
 
   tags = merge(local.tags, {
     workload = var.workload

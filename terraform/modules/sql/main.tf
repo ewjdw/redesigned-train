@@ -5,10 +5,11 @@ locals {
 }
 
 resource "azurerm_mssql_server" "rtrain_sql_server" {
-  name                         = var.sql_server_name
-  resource_group_name          = var.resource_group_name
-  location                     = var.location
-  version                      = "12.0"
+  name                          = var.sql_server_name
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
+  version                       = "12.0"
+  public_network_access_enabled = false
 
   azuread_administrator {
     login_username              = var.display_name
