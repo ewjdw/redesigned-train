@@ -10,10 +10,11 @@ resource "azurerm_service_plan" "rtrain_service_plan" {
 }
 
 resource "azurerm_linux_web_app" "rtrain_app_service" {
-  name                = "app-${var.workload}-${var.environment}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  service_plan_id = azurerm_service_plan.rtrain_service_plan.id
+  name                          = "app-${var.workload}-${var.environment}"
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
+  service_plan_id               = azurerm_service_plan.rtrain_service_plan.id
+  public_network_access_enabled = false
 
   identity {
     type = "SystemAssigned"
@@ -33,4 +34,44 @@ resource "azurerm_linux_web_app" "rtrain_app_service" {
   }
 
   tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "app_pep" {
+  name                = "pep-${azurerm_linux_web_app.rtrain_app_service.name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  subnet_id = var.subnet_id
+
+  private_service_connection {
+    name                           = "pep-${azurerm_linux_web_app.rtrain_app_service.name}"
+    private_connection_resource_id = azurerm_linux_web_app.rtrain_app_service.id
+    subresource_names              = ["sites"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = var.app_dns_zone_name
+    private_dns_zone_ids = [var.app_dns_zone_id]
+  }
+}
+
+resource "azurerm_private_endpoint" "app_scm_pep" {
+  name                = "pep-${azurerm_linux_web_app.rtrain_app_service.name}-scm"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  subnet_id = var.subnet_id
+
+  private_service_connection {
+    name                           = "pep-${azurerm_linux_web_app.rtrain_app_service.name}-scm"
+    private_connection_resource_id = azurerm_linux_web_app.rtrain_app_service.id
+    subresource_names              = ["scm"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = var.scm_dns_zone_name
+    private_dns_zone_ids = [var.scm_dns_zone_id]
+  }
 }

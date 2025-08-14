@@ -2,8 +2,6 @@ name: "Build and Deploy Application"
 
 on:
   workflow_dispatch:
-  push:
-    branches: [deploy_app]
   pull_request:
     types: [closed]
     branches: [main]

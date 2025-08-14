@@ -53,3 +53,34 @@ variable "sql_database_name" {
   
 }
 
+variable "subnet_id" {
+  description = "The ID of the subnet where the App Service will be deployed"
+  type        = string
+  
+}
+
+variable "app_dns_zone_name" {
+  description = "The name of the private DNS zone for the App Service"
+  type        = string
+  default = "privatelink.azurewebsites.net"
+  
+}
+
+variable "app_dns_zone_id" {
+  description = "The ID of the private DNS zone for the App Service"
+  type        = string
+  
+}
+
+variable "scm_dns_zone_name" {
+  description = "The name of the private DNS zone for the SCM (Kudu) endpoint"
+  type        = string
+  default = "scm.privatelink.azurewebsites.net"
+  
+}
+
+variable "scm_dns_zone_id" {
+  description = "The ID of the private DNS zone for the SCM (Kudu) endpoint"
+  type        = string
+  
+}

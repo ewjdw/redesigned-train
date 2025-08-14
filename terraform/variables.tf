@@ -34,6 +34,12 @@ variable "acr_sku" {
   
 }
 
+variable "vnet_range" {
+  description = "The CIDR range for the virtual network"
+  type        = string
+  
+}
+
 variable "spn" {
   description = "Service Principal details for the deployment"
   type = object({

@@ -2,9 +2,6 @@ name: Terraform Deploy Workflow
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - terraform_initial_structure
   pull_request:
     branches:
       - main
